@@ -1,0 +1,7 @@
+numpy
+scipy
+nibabel
+scikit-image
+matplotlib
+PyYAML
+pytest

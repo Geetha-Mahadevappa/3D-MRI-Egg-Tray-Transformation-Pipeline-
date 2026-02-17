@@ -1,0 +1,42 @@
+services:
+  # This service fixes host-mounted folder ownership as root
+  fix-permissions:
+    image: alpine
+    user: root
+    volumes:
+      - ./results:/app/results
+    # Ensures the UID/GID from your environment matches the host folder
+    command: chown -R ${UID:-1000}:${GID:-1000} /app/results
+
+  mri-pipeline:
+    build:
+      context: .
+      args:
+        - USER_ID=${UID:-1000}
+        - GROUP_ID=${GID:-1000}
+    user: "${UID:-1000}:${GID:-1000}"
+    depends_on:
+      fix-permissions:
+        condition: service_completed_successfully
+    volumes:
+      - ./data:/app/data
+      - ./results:/app/results
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python main.py
+    deploy:
+      resources:
+        limits:
+          memory: 5G
+          cpus: '2.0'
+
+
+  mri-tests:
+    build: .
+    user: "${UID:-1000}:${GID:-1000}"
+    depends_on:
+      fix-permissions:
+        condition: service_completed_successfully
+    volumes:
+      - ./results:/app/results
+    entrypoint: ["pytest", "-p", "no:cacheprovider"]
