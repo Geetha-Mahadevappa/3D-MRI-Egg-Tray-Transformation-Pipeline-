@@ -1,0 +1,9 @@
+paths:
+  input_path: "data/mri-egg-tray.nii"    # 3D MRI volume to process
+  output_dir: "results/eggs"
+  log_dir: "results/logs"
+
+parameters:
+  sigma: 1.0                # Gaussian smoothing for MRI noise
+  expected_egg_count: 12    # Standard tray size
+  row_tolerance: 50         # Vertical pixel/voxel slack for row grouping
